@@ -13,7 +13,6 @@
       background-position: center;
     }
 
-    /* Górne menu */
     header {
       background-color: rgb(15 74 143 / 70%);
       color: white;
@@ -23,22 +22,22 @@
       font-weight: bold;
     }
 
-    /* Układ strony */
     .layout {
       display: flex;
     }
 
-    /* Lewe menu */
     aside {
-      width: 200px;
+      z-index: 1;
+      width: 10%;
       background-color: rgba(255, 255, 255, 0.8);
-      height: calc(100vh - 60px);
+      min-height: 100vh;
       padding: 20px;
       box-shadow: -1px 4.45rem 3rem 20px rgba(0, 0, 0, 0.75);
     }
 
     button {
       background-color: rgb(15 74 143);
+      width: 20%;
       color: white;
       border: none;
       border-radius: 8px;
@@ -65,16 +64,86 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-
       align-items: center;
-      padding: 40px;
+      gap: 30px;
+      padding: 30px;
       background-color: rgba(255, 255, 255, 0.69);
+    }
+
+    .search {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 50px
     }
 
     input {
       padding: 10px;
       width: 300px;
       font-size: 16px;
+    }
+
+    .answers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 50px;
+    }
+
+    .answer-box {
+      padding: 20px;
+      border: 2px solid #cf7ac9;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 10px;
+      font-weight: bold;
+
+      flex: 1 1 40%;
+      max-width: 350px;
+    }
+
+    .answer-box:hover {
+      transform: scale(1.15);
+      background-color: #f5dcee;
+    }
+
+    /* poprawna */
+    .correct {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    /* błędna */
+    .wrong {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .search,
+    .vitamin-section,
+    .quiz {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .quiz {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #questionText {
+      text-align: center;
+      margin: 50px;
+    }
+
+    #quizContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
   </style>
 </head>
@@ -91,29 +160,151 @@
     </aside>
 
     <main>
-      <section style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:50px;">
+      <section class="search">
         <label for="vitaminInput">Wpisz nazwę witaminy:</label>
         <input type="text" id="vitaminInput" placeholder="np. Witamina C">
+      </section>
+      <section class="search">
+        <button onclick="showInformationAboutVitamin()">Sprawdź</button>
+      </section>
+
+      <section class="vitamin-section">
+
+        <h2>Witamina <span id="vitaminName"></span></h2>
+
+        <section>
+          <h3>Funkcje</h3>
+          <p id="functions"></p>
+        </section>
+
+        <section>
+          <h3>Skutki niedoboru</h3>
+          <p id="deficiency"></p>
+        </section>
+
+        <section>
+          <h3>Źródła</h3>
+          <p id="sources"></p>
+        </section>
+
+      </section>
+
+      <section class="quiz">
+
+        <h2>Quiz</h2>
+
+        <select id="questionSelect" onchange="loadQuestion()">
+          <option value="">-- Wybierz pytanie --</option>
+          <option value="0">Pytanie 1</option>
+          <option value="1">Pytanie 2</option>
+        </select>
+
+        <section id="quizContent" style="display:none; margin:20px;">
+          <h3 id="questionText"></h3>
+          <div id="answers" class="answers"></div>
+        </section>
+
+
       </section>
 
 
 
-      <br>
-      <button onclick="showValue()">Sprawdź</button>
-
-      <p id="result"></p>
     </main>
 
   </section>
 
   <script>
-    function showValue() {
-      const value = document.getElementById('vitaminInput').value;
-      document.getElementById('result').innerText = "Wpisałeś: " + value;
+    const questions = [
+      {
+        text: "Która witamina odpowiada za prawidłowe widzenie?",
+        answers: ["Witamina C", "Witamina A", "Witamina D", "Witamina K"],
+        correct: 1
+      },
+      {
+        text: "Który pierwiastek jest głównym składnikiem hemoglobiny?",
+        answers: ["Wapń", "Żelazo", "Magnez", "Sód"],
+        correct: 1
+      }
+    ];
+    document.querySelector('.vitamin-section').style.display = 'none';
+    const vitamins = {
+      A: {
+        functions: "Wpływa na wzrok i odporność.",
+        deficiency: "Pogorszenie wzroku, problemy ze skórą.",
+        sources: "Marchew, wątroba, nabiał."
+      },
+      B: {
+        functions: "Wspiera układ nerwowy.",
+        deficiency: "Zmęczenie, problemy z koncentracją.",
+        sources: "Produkty zbożowe, mięso."
+      }
+    };
+    function showInformationAboutVitamin() {
+      const input = document.getElementById('vitaminInput').value.toUpperCase();
+      if (!input) {
+        document.querySelector('.vitamin-section').style.display = 'none';
+        return;
+      }
+      const vitamin = vitamins[input];
+
+      if (!vitamin) {
+        alert("Brak danych dla tej witaminy");
+        return;
+      }
+
+      document.querySelector('.vitamin-section').style.display = 'block';
+
+      document.getElementById('vitaminName').textContent = input;
+      document.getElementById('functions').textContent = vitamin.functions;
+      document.getElementById('deficiency').textContent = vitamin.deficiency;
+      document.getElementById('sources').textContent = vitamin.sources;
     }
 
     function goToQuiz() {
       alert("Przejście do quizu (możesz tu dodać kolejną stronę)");
+    }
+
+    function loadQuestion() {
+      const select = document.getElementById("questionSelect").value;
+
+      if (select === "") {
+        document.getElementById("quizContent").style.display = "none";
+        return;
+      }
+
+      const question = questions[select];
+
+      document.getElementById("quizContent").style.display = "block";
+      document.getElementById("questionText").textContent = question.text;
+
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+
+      question.answers.forEach((answer, index) => {
+        const div = document.createElement("div");
+        div.classList.add("answer-box");
+        div.textContent = answer;
+
+        div.onclick = () => checkAnswer(div, index, question.correct);
+
+        answersDiv.appendChild(div);
+      });
+    }
+    
+    function checkAnswer(clickedElement, selected, correct) {
+      const allAnswers = document.querySelectorAll(".answer-box");
+
+      allAnswers.forEach((el, index) => {
+        el.style.pointerEvents = "none";
+
+        if (index === correct) {
+          el.classList.add("correct");
+        }
+
+        if (index === selected && selected !== correct) {
+          el.classList.add("wrong");
+        }
+      });
     }
   </script>
 
