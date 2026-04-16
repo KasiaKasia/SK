@@ -26,15 +26,6 @@
       display: flex;
     }
 
-    aside {
-      z-index: 1;
-      width: 10%;
-      background-color: rgba(255, 255, 255, 0.8);
-      min-height: 100vh;
-      padding: 20px;
-      box-shadow: -1px 4.45rem 3rem 20px rgba(0, 0, 0, 0.75);
-    }
-
     button {
       background-color: rgb(15 74 143);
       width: 20%;
@@ -52,22 +43,15 @@
       background-color: rgb(25 95 175);
     }
 
-    aside button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 30px;
-      padding: 30px;
+      padding: 50px;
       background-color: rgba(255, 255, 255, 0.69);
+      min-height: 100vh;
     }
 
     .search {
@@ -75,14 +59,33 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 50px
+      gap: 30px;
     }
 
     input {
       padding: 10px;
       width: 300px;
       font-size: 16px;
+    }
+
+    select {
+      padding: 14px 16px;
+      width: 400px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    select:hover {
+      transform: scale(1.03);
+    }
+
+    select:focus {
+      box-shadow: 0 0 0 2px rgb(15 74 143);
     }
 
     .answers {
@@ -99,9 +102,8 @@
       cursor: pointer;
       border-radius: 10px;
       font-weight: bold;
-
       flex: 1 1 40%;
-      max-width: 350px;
+      max-width: 250px;
     }
 
     .answer-box:hover {
@@ -125,7 +127,7 @@
     .vitamin-section,
     .quiz {
       width: 100%;
-      max-width: 900px;
+      max-width: 1500px;
     }
 
     .quiz {
@@ -155,19 +157,12 @@
 
   <section class="layout">
 
-    <aside>
-      <button onclick="goToQuiz()">QUIZ</button>
-    </aside>
-
     <main>
       <section class="search">
         <label for="vitaminInput">Wpisz nazwę witaminy:</label>
         <input type="text" id="vitaminInput" placeholder="np. Witamina C">
-      </section>
-      <section class="search">
         <button onclick="showInformationAboutVitamin()">Sprawdź</button>
       </section>
-
       <section class="vitamin-section">
 
         <h2>Witamina <span id="vitaminName"></span></h2>
@@ -199,7 +194,7 @@
           <option value="1">Pytanie 2</option>
         </select>
 
-        <section id="quizContent" style="display:none; margin:20px;">
+        <section id="quizContent" style="display:none;">
           <h3 id="questionText"></h3>
           <div id="answers" class="answers"></div>
         </section>
@@ -229,7 +224,7 @@
     document.querySelector('.vitamin-section').style.display = 'none';
     const vitamins = {
       A: {
-        functions: "Wpływa na wzrok i odporność.",
+        functions: "Witaj na stronie poświęconej nauce języka JavaScript. Podczas tej lekcji poznasz, w jaki sposób reagować na działania użytkownika oraz jak manipulować strukturą dokumentu HTML.",
         deficiency: "Pogorszenie wzroku, problemy ze skórą.",
         sources: "Marchew, wątroba, nabiał."
       },
@@ -260,9 +255,7 @@
       document.getElementById('sources').textContent = vitamin.sources;
     }
 
-    function goToQuiz() {
-      alert("Przejście do quizu (możesz tu dodać kolejną stronę)");
-    }
+
 
     function loadQuestion() {
       const select = document.getElementById("questionSelect").value;
@@ -290,7 +283,7 @@
         answersDiv.appendChild(div);
       });
     }
-    
+
     function checkAnswer(clickedElement, selected, correct) {
       const allAnswers = document.querySelectorAll(".answer-box");
 
@@ -307,7 +300,5 @@
       });
     }
   </script>
-
 </body>
-
 </html>
