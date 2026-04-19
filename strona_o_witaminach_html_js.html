@@ -16,9 +16,9 @@
     header {
       background-color: rgb(15 74 143 / 70%);
       color: white;
-      padding: 40px;
+      padding: 25px;
       text-align: center;
-      font-size: 35px;
+      font-size: 30px;
       font-weight: bold;
     }
 
@@ -48,7 +48,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 10px;
       padding: 50px;
       background-color: rgba(255, 255, 255, 0.69);
       min-height: 100vh;
@@ -147,25 +147,64 @@
       align-items: center;
       width: 100%;
     }
+
+    .sidebar {
+      width: 200px;
+      color: white;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      background-color: rgb(15 74 143 / 65%);
+      box-shadow: 24px -10px 15px rgba(0, 0, 0, 0.65)
+    }
+
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.35), transparent);
+      pointer-events: none;
+    }
+
+    .vertical-words {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+      gap: 25px;
+      font-size: 25px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
-  <header>
-    Rola witamin i składników mineralnych w organizmie człowieka
-  </header>
-
   <section class="layout">
-
+    <aside class="sidebar">
+      <div class="vertical-words">
+        <span>Rola</span>
+        <span>witamin i</span>
+        <span>składników</span>
+        <span>mineralnych w</span>
+        <span>organizmie</span>
+        <span>człowieka</span>
+      </div>
+    </aside>
     <main>
+
       <section class="search">
         <label for="vitaminInput">Wpisz nazwę witaminy:</label>
-        <input type="text" id="vitaminInput" placeholder="np. Witamina C">
+        <input type="text" id="vitaminInput" placeholder="np. Witamina C"
+          onkeydown="if(event.key==='Enter') showInformationAboutVitamin()">
         <button onclick="showInformationAboutVitamin()">Sprawdź</button>
       </section>
       <section class="vitamin-section">
 
-        <h2>Witamina <span id="vitaminName"></span></h2>
+        <p id="vitaminDescription" style="font-weight: bold;"></p>
+        <h2 id="vitaminTitle"></h2>
 
         <section>
           <h3>Funkcje</h3>
@@ -224,37 +263,142 @@
     document.querySelector('.vitamin-section').style.display = 'none';
     const vitamins = {
       A: {
-        functions: "Witaj na stronie poświęconej nauce języka JavaScript. Podczas tej lekcji poznasz, w jaki sposób reagować na działania użytkownika oraz jak manipulować strukturą dokumentu HTML.",
-        deficiency: "Pogorszenie wzroku, problemy ze skórą.",
-        sources: "Marchew, wątroba, nabiał."
+        functions: ["niezbędna do prawidłowego widzenia (zwłaszcza o zmierzchu),",
+          "bierze udział w utrzymaniu zdrowych nabłonków (skóry i błon śluzowych),",
+          "wspiera wzrost i rozwój organizmu,",
+          "wpływa na odporność."],
+        deficiency: ["kurza ślepota (problemy z widzeniem po zmroku),",
+          "pogorszenie widzenia przy słabym oświetleniu,",
+          "suchość i rogowacenie skóry (łuszczenie nabłonków),",
+          "zahamowanie wzrostu,",
+          "większa podatność na infekcje."],
+        sources: ["produkty zwierzęce: nabiał, wątroba, tran,",
+          "produkty roślinne (zawierające β-karoten): pomarańczowe i żółte warzywa i owoce (np. marchew), ciemnozielone warzywa (np. szpinak)."]
       },
       B: {
-        functions: "Wspiera układ nerwowy.",
-        deficiency: "Zmęczenie, problemy z koncentracją.",
-        sources: "Produkty zbożowe, mięso."
+        functions: ["udział w przemianach metabolicznych (pozyskiwanie energii z pożywienia),",
+          "prawidłowe funkcjonowanie układu nerwowego,",
+          "udział w produkcji czerwonych krwinek (szczególnie B₉ i B₁₂),",
+          "wpływ na stan skóry, włosów i paznokci,",
+          "wspieranie pracy mózgu i koncentracji."],
+        deficiency: ["zmęczenie i osłabienie,",
+          "zaburzenia pracy układu nerwowego (np. drętwienie, problemy z koncentracją),",
+          "anemia (zwłaszcza przy niedoborze B₉ i B₁₂),",
+          "zmiany skórne, zajady w kącikach ust,",
+          "pogorszenie stanu włosów i paznokci."],
+        sources: ["produkty pełnoziarniste,",
+          "mięso i podroby (zwłaszcza wątroba),",
+          "jaja i nabiał,",
+          "rośliny strączkowe,",
+          "orzechy i nasiona,",
+          "zielone warzywa liściaste."]
+      },
+
+      C: {
+        functions: ["silny przeciwutleniacz (chroni komórki przed wolnymi rodnikami),",
+          "uczestniczy w syntezie kolagenu (ważna dla skóry, naczyń krwionośnych, kości),",
+          "wspiera układ odpornościowy,",
+          "zwiększa wchłanianie żelaza z pożywienia,",
+          "przyspiesza gojenie ran."],
+        deficiency: ["szkorbut (krwawienie dziąseł, wypadanie zębów),",
+          "osłabienie i zmęczenie,",
+          "obniżona odporność,",
+          "wolniejsze gojenie ran,",
+          "kruchość naczyń krwionośnych (łatwe powstawanie siniaków)."],
+        sources: ["świeże owoce (np. cytrusy, truskawki, czarna porzeczka),",
+          "warzywa (np. papryka, kapusta, brokuły),", "natka pietruszki,", "ziemniaki."]
+      },
+      K: {
+        functions: ["niezbędna w procesie krzepnięcia krwi (synteza czynników krzepnięcia),",
+          "bierze udział w metabolizmie kości (wpływa na wiązanie wapnia),",
+          "wspiera utrzymanie prawidłowej struktury kości."],
+        deficiency: ["zaburzenia krzepnięcia krwi,",
+          "skłonność do krwawień i siniaków,",
+          "wydłużony czas gojenia ran,",
+          "u noworodków – ryzyko krwawień (tzw. choroba krwotoczna)."],
+        sources: ["zielone warzywa liściaste (np. szpinak, jarmuż, sałata),",
+          "brokuły, kapusta,",
+          "produkty fermentowane (źródło K₂)"]
       }
     };
+    function normalizeInput(input) {
+      return input
+        .toUpperCase()
+        .replace(/\s+/g, '')
+        .replace('WITAMINA', '')
+        .replace(/₁/g, '1')
+        .replace(/₂/g, '2')
+        .replace(/₃/g, '3')
+        .replace(/₄/g, '4')
+        .replace(/₅/g, '5')
+        .replace(/₆/g, '6')
+        .replace(/₇/g, '7')
+        .replace(/₈/g, '8')
+        .replace(/₉/g, '9');
+    }
+
+    function detectVitamin(input) {
+      if (/^B(\d{1,2})?$/.test(input) || input.includes('ODB') || input.includes('DOB')) {
+        return 'B';
+      }
+
+      if (input === 'A') return 'A';
+      if (input === 'C') return 'C';
+      if (input === 'K') return 'K';
+
+      return null;
+    }
+
     function showInformationAboutVitamin() {
-      const input = document.getElementById('vitaminInput').value.toUpperCase();
-      if (!input) {
+      const rawInput = document.getElementById('vitaminInput').value;
+
+      if (!rawInput) {
         document.querySelector('.vitamin-section').style.display = 'none';
         return;
       }
-      const vitamin = vitamins[input];
 
-      if (!vitamin) {
+      const normalized = normalizeInput(rawInput);
+      const vitaminKey = detectVitamin(normalized);
+
+      if (!vitaminKey || !vitamins[vitaminKey]) {
         alert("Brak danych dla tej witaminy");
         return;
       }
 
+      const vitamin = vitamins[vitaminKey];
+
       document.querySelector('.vitamin-section').style.display = 'block';
 
-      document.getElementById('vitaminName').textContent = input;
-      document.getElementById('functions').textContent = vitamin.functions;
-      document.getElementById('deficiency').textContent = vitamin.deficiency;
-      document.getElementById('sources').textContent = vitamin.sources;
-    }
+      const title = document.getElementById('vitaminTitle');
+      const description = document.getElementById('vitaminDescription');
+      description.style.display = vitaminKey === 'B' ? 'block' : 'none';
+      if (vitaminKey === 'B') {
+        description.textContent = "Witaminy z grupy B to nie jedna substancja, tylko kilka różnych witamin – najlepiej ująć je razem w skróconej, uporządkowanej formie:";
+        title.textContent = "Witaminy z grupy B (B₁, B₂, B₃, B₅, B₆, B₇, B₉, B₁₂)";
+      } else {
+        description.textContent = "";
+        title.textContent = "Witamina " + vitaminKey;
+      }
 
+      renderList('functions', vitamin.functions);
+      renderList('deficiency', vitamin.deficiency);
+      renderList('sources', vitamin.sources);
+    }
+    function renderList(elementId, items) {
+      const container = document.getElementById(elementId);
+
+      container.textContent = '';
+
+      const ul = document.createElement('ul');
+
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item; // 🔐 bezpieczne (brak XSS)
+        ul.appendChild(li);
+      });
+
+      container.appendChild(ul);
+    }
 
 
     function loadQuestion() {
@@ -301,4 +445,5 @@
     }
   </script>
 </body>
+
 </html>
