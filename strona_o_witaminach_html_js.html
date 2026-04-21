@@ -113,13 +113,13 @@
 
     /* poprawna */
     .correct {
-      background-color: #4CAF50;
+      background-color: #2aa42f8c;
       color: white;
     }
 
     /* błędna */
     .wrong {
-      background-color: #f44336;
+      background-color: #fb110099;
       color: white;
     }
 
@@ -220,11 +220,9 @@
           <h3>Źródła</h3>
           <p id="sources"></p>
         </section>
-
       </section>
 
       <section class="quiz">
-
         <h2>Quiz</h2>
 
         <select id="questionSelect" onchange="loadQuestion()">
@@ -238,13 +236,8 @@
           <div id="answers" class="answers"></div>
         </section>
 
-
       </section>
-
-
-
     </main>
-
   </section>
 
   <script>
@@ -263,6 +256,7 @@
     document.querySelector('.vitamin-section').style.display = 'none';
     const vitamins = {
       A: {
+        title: "Witamina A (retinol)",
         functions: ["niezbędna do prawidłowego widzenia (zwłaszcza o zmierzchu),",
           "bierze udział w utrzymaniu zdrowych nabłonków (skóry i błon śluzowych),",
           "wspiera wzrost i rozwój organizmu,",
@@ -276,6 +270,8 @@
           "produkty roślinne (zawierające β-karoten): pomarańczowe i żółte warzywa i owoce (np. marchew), ciemnozielone warzywa (np. szpinak)."]
       },
       B: {
+        title: "Witaminy z grupy B (B₁, B₂, B₃, B₅, B₆, B₇, B₉, B₁₂)",
+        description: 'Witaminy z grupy B to nie jedna substancja, tylko kilka różnych witamin – najlepiej ująć je razem w skróconej, uporządkowanej formie:',
         functions: ["udział w przemianach metabolicznych (pozyskiwanie energii z pożywienia),",
           "prawidłowe funkcjonowanie układu nerwowego,",
           "udział w produkcji czerwonych krwinek (szczególnie B₉ i B₁₂),",
@@ -295,6 +291,7 @@
       },
 
       C: {
+        title: 'Witamina C (kwas askorbinowy)',
         functions: ["silny przeciwutleniacz (chroni komórki przed wolnymi rodnikami),",
           "uczestniczy w syntezie kolagenu (ważna dla skóry, naczyń krwionośnych, kości),",
           "wspiera układ odpornościowy,",
@@ -309,6 +306,7 @@
           "warzywa (np. papryka, kapusta, brokuły),", "natka pietruszki,", "ziemniaki."]
       },
       K: {
+        title: 'Witamina K (filochinon K₁, menachinon K₂)',
         functions: ["niezbędna w procesie krzepnięcia krwi (synteza czynników krzepnięcia),",
           "bierze udział w metabolizmie kości (wpływa na wiązanie wapnia),",
           "wspiera utrzymanie prawidłowej struktury kości."],
@@ -319,6 +317,23 @@
         sources: ["zielone warzywa liściaste (np. szpinak, jarmuż, sałata),",
           "brokuły, kapusta,",
           "produkty fermentowane (źródło K₂)"]
+      },
+      D: {
+        title: 'Witamina D₃ (cholekalcyferol)',
+        functions: ["reguluje gospodarkę wapniowo-fosforanową (zwiększa wchłanianie wapnia i fosforu),",
+          "warunkuje prawidłową mineralizację kości i zębów,",
+          "wspiera pracę układu odpornościowego,",
+          "wpływa na funkcjonowanie mięśni."],
+        deficiency: ["krzywica u dzieci,",
+          "osteomalacja (rozmiękczenie kości) u dorosłych,",
+          "większe ryzyko osteoporozy,",
+          "osłabienie mięśni,",
+          "zwiększona podatność na infekcje."],
+        sources: ["synteza skórna pod wpływem promieniowania UVB (słońce),",
+          "tłuste ryby (np. łosoś, makrela),",
+          "tran,",
+          "żółtka jaj,",
+          "produkty wzbogacane (np. niektóre mleka i margaryny)."]
       }
     };
     function normalizeInput(input) {
@@ -345,7 +360,8 @@
       if (input === 'A') return 'A';
       if (input === 'C') return 'C';
       if (input === 'K') return 'K';
-
+      if (input === 'D₃' || input === 'D3') return 'D';
+      if (input === 'K₁' || input === 'K1' || input === 'K₂' || input === 'K2') return 'K';
       return null;
     }
 
@@ -371,14 +387,11 @@
 
       const title = document.getElementById('vitaminTitle');
       const description = document.getElementById('vitaminDescription');
+
+      title.textContent = vitamin.title;
+      description.textContent = vitamin.description;
+      description.style.display = vitamin.description ? 'block' : 'none'
       description.style.display = vitaminKey === 'B' ? 'block' : 'none';
-      if (vitaminKey === 'B') {
-        description.textContent = "Witaminy z grupy B to nie jedna substancja, tylko kilka różnych witamin – najlepiej ująć je razem w skróconej, uporządkowanej formie:";
-        title.textContent = "Witaminy z grupy B (B₁, B₂, B₃, B₅, B₆, B₇, B₉, B₁₂)";
-      } else {
-        description.textContent = "";
-        title.textContent = "Witamina " + vitaminKey;
-      }
 
       renderList('functions', vitamin.functions);
       renderList('deficiency', vitamin.deficiency);
@@ -393,7 +406,7 @@
 
       items.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item; // 🔐 bezpieczne (brak XSS)
+        li.textContent = item;
         ul.appendChild(li);
       });
 
@@ -430,18 +443,10 @@
 
     function checkAnswer(clickedElement, selected, correct) {
       const allAnswers = document.querySelectorAll(".answer-box");
+      allAnswers.forEach(el => el.style.pointerEvents = "none");
+      allAnswers.forEach((el, index) => el.style.pointerEvents = "none");
+      (selected === correct) ? clickedElement.classList.add("correct") : clickedElement.classList.add("wrong");
 
-      allAnswers.forEach((el, index) => {
-        el.style.pointerEvents = "none";
-
-        if (index === correct) {
-          el.classList.add("correct");
-        }
-
-        if (index === selected && selected !== correct) {
-          el.classList.add("wrong");
-        }
-      });
     }
   </script>
 </body>
