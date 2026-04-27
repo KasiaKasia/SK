@@ -477,34 +477,34 @@
           "produkty wzbogacane (np. niektóre mleka i margaryny)."]
       }
     };
-    function normalizeInput(input) {
-      return input
-        .toUpperCase()
-        .replace(/\s+/g, '')
-        .replace('WITAMINA', '')
-        .replace(/₁/g, '1')
-        .replace(/₂/g, '2')
-        .replace(/₃/g, '3')
-        .replace(/₄/g, '4')
-        .replace(/₅/g, '5')
-        .replace(/₆/g, '6')
-        .replace(/₇/g, '7')
-        .replace(/₈/g, '8')
-        .replace(/₉/g, '9');
-    }
-
+   function normalizeInput(input) {
+  return input
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace('WITAMINA', '')
+    .replace(/₁/g, '1')
+    .replace(/₂/g, '2')
+    .replace(/₃/g, '3')
+    .replace(/₄/g, '4')
+    .replace(/₅/g, '5')
+    .replace(/₆/g, '6')
+    .replace(/₇/g, '7')
+    .replace(/₈/g, '8')
+    .replace(/₉/g, '9');
+}
     function detectVitamin(input) {
-      if (/^B(\d{1,2})?$/.test(input) || input.includes('ODB') || input.includes('DOB')) {
-        return 'B';
-      }
 
-      if (input === 'A') return 'A';
-      if (input === 'C') return 'C';
-      if (input === 'K') return 'K';
-      if (input === 'D₃' || input === 'D3') return 'D';
-      if (input === 'K₁' || input === 'K1' || input === 'K₂' || input === 'K2') return 'K';
-      return null;
-    }
+  input = input.toUpperCase().trim();
+
+  if (/^B(\d{1,2})?$/.test(input)) return 'B';
+
+  if (input.includes('A')) return 'A';
+  if (input.includes('C')) return 'C';
+  if (input.includes('D')) return 'D';
+  if (input.includes('K')) return 'K';
+
+  return null;
+}
 
     function loadQuestion() {
       const select = document.getElementById("questionSelect").value;
@@ -588,6 +588,48 @@
         select.appendChild(option);
       });
     }
+    function showInformationAboutVitamin() {
+  const rawInput = document.getElementById('vitaminInput').value;
+
+  if (!rawInput) {
+    document.querySelector('.vitamin-section').style.display = 'none';
+    return;
+  }
+
+  const normalized = normalizeInput(rawInput);
+  const vitaminKey = detectVitamin(normalized);
+
+  if (!vitaminKey || !vitamins[vitaminKey]) {
+    alert("Brak danych dla tej witaminy");
+    return;
+  }
+
+  const vitamin = vitamins[vitaminKey];
+
+  document.querySelector('.vitamin-section').style.display = 'block';
+
+  document.getElementById('vitaminTitle').textContent = vitamin.title;
+
+  const description = document.getElementById('vitaminDescription');
+  description.textContent = vitamin.description || '';
+  description.style.display = vitamin.description ? 'block' : 'none';
+
+  renderList('functions', vitamin.functions);
+  renderList('deficiency', vitamin.deficiency);
+  renderList('sources', vitamin.sources);
+}
+function renderList(elementId, items) {
+  const container = document.getElementById(elementId);
+
+  if (!items || items.length === 0) {
+    container.textContent = "";
+    return;
+  }
+
+  container.innerHTML = items
+    .map(item => `<p>${item}</p>`)
+    .join("");
+}
     loadQuestionsToSelect();
   </script>
 </body>
