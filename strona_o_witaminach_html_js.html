@@ -178,6 +178,24 @@
       font-weight: bold;
       text-align: center;
     }
+
+    .selected {
+      transform: scale(1.3);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .reset {
+      transform: scale(1);
+    }
+
+    .btn-text {
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .text-animate {
+      transform: scale(1.4);
+    }
   </style>
 </head>
 
@@ -227,8 +245,7 @@
 
         <select id="questionSelect" onchange="loadQuestion()">
           <option value="">-- Wybierz pytanie --</option>
-          <option value="0">Pytanie 1</option>
-          <option value="1">Pytanie 2</option>
+
         </select>
 
         <section id="quizContent" style="display:none;">
@@ -243,14 +260,138 @@
   <script>
     const questions = [
       {
+        type: "closed",
         text: "Która witamina odpowiada za prawidłowe widzenie?",
         answers: ["Witamina C", "Witamina A", "Witamina D", "Witamina K"],
         correct: 1
       },
       {
+        type: "closed",
         text: "Który pierwiastek jest głównym składnikiem hemoglobiny?",
         answers: ["Wapń", "Żelazo", "Magnez", "Sód"],
         correct: 1
+      },
+      {
+        type: "closed",
+        text: "Niedobór której witaminy powoduje szkorbut?",
+        answers: ["Witamina  B₁₂", "Witamina D", "Witamina C", "Witamina A"],
+        correct: 2
+      },
+      {
+        type: "closed",
+        text: "Wapń pełni w organizmie przede wszystkim funkcję:",
+        answers: ["energetyczną", "budulcową", "transportową", "magazynującą"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Która witamina bierze udział w krzepnięciu krwi?",
+        answers: ["Witamina E", "Witamina K", "Witamina B₆", "Witamina C"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Niedobór jodu może prowadzić do:",
+        answers: ["anemii", "wola tarczycy", "krzywicy", "szkorbutu"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Witamina D odpowiada za:",
+        answers: ["odporność", "wchłanianie wapnia", "krzepnięcie krwi", "widzenie"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Które pierwiastki odpowiadają za przewodzenie impulsów nerwowych?",
+        answers: ["Żelazo i miedź", "Sód i potas", "Wapń i fosfor", "Fluor i jod"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Która z poniższych witamin jest rozpuszczalna w tłuszczach?",
+        answers: ["Witamina  C", "Witamina B₁", "Witamina D", "Witamina B₂"],
+        correct: 2
+      },
+      {
+        type: "closed",
+        text: "Magnez wpływa głównie na:",
+        answers: ["pracę mięśni i układu nerwowego", "widzenie", "trawienie tłuszczów", "produkcję hormonów"],
+        correct: 0
+      },
+      {
+        type: "closed",
+        text: "Witamina E działa jako przeciwutleniacz.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      },
+      {
+        type: "closed",
+        text: "Nadmiar witamin rozpuszczalnych w tłuszczach może być szkodliwy.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      },
+      {
+        type: "closed",
+        text: "Składniki mineralne dostarczają energii organizmowi.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Żelazo bierze udział w transporcie tlenu.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      }
+
+      ,
+      {
+        type: "closed",
+        text: "Witamina D może być syntetyzowana w skórze pod wpływem słońca.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      },
+      {
+        type: "closed",
+        text: " Fluor wzmacnia szkliwo zębów.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      },
+      {
+        type: "closed",
+        text: "Wszystkie witaminy muszą być dostarczane wyłącznie z dietą.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 1
+      },
+      {
+        type: "closed",
+        text: "Nadmiar sodu może prowadzić do nadciśnienia.",
+        answers: ["Prawda", "Fałsz"],
+        correct: 0
+      },
+      {
+        type: "open",
+        text: "Wymień dwie witaminy rozpuszczalne w wodzie."
+      },
+      {
+        type: "open",
+        text: "Podaj dwie funkcje witaminy C."
+      },
+      {
+        type: "open",
+        text: "Wymień dwa makroelementy i dwa mikroelementy."
+      },
+      {
+        type: "open",
+        text: "Jaką rolę pełni wapń w organizmie?"
+      },
+      {
+        type: "open",
+        text: "Podaj dwa skutki niedoboru żelaza."
+      },
+      {
+        type: "open",
+        text: "Wyjaśnij różnicę między witaminami rozpuszczalnymi w wodzie i w tłuszczach."
       }
     ];
     document.querySelector('.vitamin-section').style.display = 'none';
@@ -365,55 +506,6 @@
       return null;
     }
 
-    function showInformationAboutVitamin() {
-      const rawInput = document.getElementById('vitaminInput').value;
-
-      if (!rawInput) {
-        document.querySelector('.vitamin-section').style.display = 'none';
-        return;
-      }
-
-      const normalized = normalizeInput(rawInput);
-      const vitaminKey = detectVitamin(normalized);
-
-      if (!vitaminKey || !vitamins[vitaminKey]) {
-        alert("Brak danych dla tej witaminy");
-        return;
-      }
-
-      const vitamin = vitamins[vitaminKey];
-
-      document.querySelector('.vitamin-section').style.display = 'block';
-
-      const title = document.getElementById('vitaminTitle');
-      const description = document.getElementById('vitaminDescription');
-
-      title.textContent = vitamin.title;
-      description.textContent = vitamin.description;
-      description.style.display = vitamin.description ? 'block' : 'none'
-      description.style.display = vitaminKey === 'B' ? 'block' : 'none';
-
-      renderList('functions', vitamin.functions);
-      renderList('deficiency', vitamin.deficiency);
-      renderList('sources', vitamin.sources);
-    }
-    function renderList(elementId, items) {
-      const container = document.getElementById(elementId);
-
-      container.textContent = '';
-
-      const ul = document.createElement('ul');
-
-      items.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        ul.appendChild(li);
-      });
-
-      container.appendChild(ul);
-    }
-
-
     function loadQuestion() {
       const select = document.getElementById("questionSelect").value;
 
@@ -430,16 +522,52 @@
       const answersDiv = document.getElementById("answers");
       answersDiv.innerHTML = "";
 
-      question.answers.forEach((answer, index) => {
-        const div = document.createElement("div");
-        div.classList.add("answer-box");
-        div.textContent = answer;
+      if (question.type === "closed") {
+        question.answers.forEach((answer, index) => {
+          const div = document.createElement("div");
+          div.classList.add("answer-box");
+          div.textContent = answer;
 
-        div.onclick = () => checkAnswer(div, index, question.correct);
+          div.onclick = () => checkAnswer(div, index, question.correct);
 
-        answersDiv.appendChild(div);
-      });
+          answersDiv.appendChild(div);
+        });
+      }
+
+      if (question.type === "open") {
+        const info = document.createElement("p");
+        info.textContent = "Odpowiedz ustnie, a następnie zaznacz wynik.";
+
+        const btnCorrect = document.createElement("button");
+        btnCorrect.innerHTML = '<span class="btn-text">✔ Poprawna</span>';
+
+        const btnWrong = document.createElement("button");
+        btnWrong.innerHTML = '<span class="btn-text">❌ Błędna</span>';
+
+        btnCorrect.onclick = () => animateButton(btnCorrect);
+        btnWrong.onclick = () => animateButton(btnWrong);
+
+        answersDiv.appendChild(info);
+        answersDiv.appendChild(btnCorrect);
+        answersDiv.appendChild(btnWrong);
+      }
     }
+
+    function animateButton(button) {
+      const text = button.querySelector(".btn-text");
+
+      text.classList.remove("text-animate");
+      void text.offsetWidth;
+
+      text.classList.add("text-animate");
+
+      setTimeout(() => {
+        text.classList.remove("text-animate");
+      }, 300);
+    }
+
+
+
 
     function checkAnswer(clickedElement, selected, correct) {
       const allAnswers = document.querySelectorAll(".answer-box");
@@ -448,6 +576,19 @@
       (selected === correct) ? clickedElement.classList.add("correct") : clickedElement.classList.add("wrong");
 
     }
+    function loadQuestionsToSelect() {
+      const select = document.getElementById("questionSelect");
+
+      select.innerHTML = '<option value="">-- Wybierz pytanie --</option>';
+
+      questions.forEach((q, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `Pytanie ${index + 1}`;
+        select.appendChild(option);
+      });
+    }
+    loadQuestionsToSelect();
   </script>
 </body>
 
