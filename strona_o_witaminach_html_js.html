@@ -477,35 +477,94 @@
           "produkty wzbogacane (np. niektóre mleka i margaryny)."]
       }
     };
-   function normalizeInput(input) {
-  return input
-    .toUpperCase()
-    .replace(/\s+/g, '')
-    .replace('WITAMINA', '')
-    .replace(/₁/g, '1')
-    .replace(/₂/g, '2')
-    .replace(/₃/g, '3')
-    .replace(/₄/g, '4')
-    .replace(/₅/g, '5')
-    .replace(/₆/g, '6')
-    .replace(/₇/g, '7')
-    .replace(/₈/g, '8')
-    .replace(/₉/g, '9');
-}
-    function detectVitamin(input) {
 
-  input = input.toUpperCase().trim();
+    const minerals = {
+      CA: {
+        title: "Wapń (Ca)",
+        functions: ["budowa kości i zębów,", "krzepnięcie krwi"],
+        deficiency: ["osłabienie kości i zębów,", "krzywica u dzieci, osteoporoza u dorosłych,", "skurcze mięśni"],
+        sources: ["mleko i przetwory (jogurt, sery),", "zielone warzywa (brokuły, jarmuż),", "migdały, sezam,", "wody mineralne wysokowapniowe"]
+      },
 
-  if (/^B(\d{1,2})?$/.test(input)) return 'B';
+      MG: {
+        title: "Magnez (Mg)",
+        functions: ["praca mięśni i układu nerwowego"],
+        deficiency: ["skurcze i drżenie mięśni,", "nadpobudliwość nerwowa, stres,", "zaburzenia rytmu serca"],
+        sources: ["kakao i gorzka czekolada,", "orzechy (migdały, orzechy laskowe),", "kasze (gryczana), pełnoziarniste produkty zbożowe,", "nasiona roślin strączkowych"]
+      },
 
-  if (input.includes('A')) return 'A';
-  if (input.includes('C')) return 'C';
-  if (input.includes('D')) return 'D';
-  if (input.includes('K')) return 'K';
+      K_MINERAL: {
+        title: "Potas (K)",
+        functions: ["regulacja ciśnienia krwi,", "praca serca"],
+        deficiency: ["osłabienie mięśni,", "zaburzenia pracy serca,", "zmęczenie, problemy z koncentracją"],
+        sources: ["banany,", "ziemniaki,", "pomidory,", "warzywa strączkowe (fasola, soczewica)"]
+      },
+      NA: {
+        title: "Sód (Na)",
+        functions: ["gospodarka wodno-elektrolitowa"],
+        deficiency: ["zaburzenia gospodarki wodnej,", "spadek ciśnienia,", "zawroty głowy, osłabienie"],
+        sources: ["sól kuchenna,", "produkty przetworzone (wędliny, chipsy, dania gotowe)"]
+      },
 
-  return null;
-}
+      P: {
+        title: "Fosfor (P)",
+        functions: ["składnik kości,", "udział w metabolizmie energii"],
+        deficiency: ["osłabienie kości,", "zmęczenie,", "zaburzenia metabolizmu"],
+        sources: ["mięso i ryby,", "nabiał,", "jaja,", "produkty pełnoziarniste"]
+      },
 
+      S: {
+        title: "Siarka (S)",
+        functions: ["składnik białek i enzymów"],
+        deficiency: ["pogorszenie stanu włosów, skóry i paznokci,", "osłabienie organizmu (rzadko spotykany niedobór)"],
+        sources: ["mięso, ryby,", "jaja,", "czosnek, cebula,", "rośliny strączkowe"]
+      }
+    };
+    function normalizeInput(input) {
+      return input
+        .toUpperCase()
+        .replace(/Ą/g, 'A')
+        .replace(/Ć/g, 'C')
+        .replace(/Ę/g, 'E')
+        .replace(/Ł/g, 'L')
+        .replace(/Ń/g, 'N')
+        .replace(/Ó/g, 'O')
+        .replace(/Ś/g, 'S')
+        .replace(/Ż/g, 'Z')
+        .replace(/Ź/g, 'Z')
+        .replace(/\s+/g, '')
+        .replace('WITAMINA', '')
+        .replace(/[()]/g, '')
+        .replace(/₁/g, '1')
+        .replace(/₂/g, '2')
+        .replace(/₃/g, '3');
+    }
+    function detectNutrient(input) {
+
+      input = input.trim();
+
+      // WITAMINA K (dokładnie K/k)
+      if (input === "k" || input === "K") return "K";
+
+      input = input.toUpperCase();
+
+      // MINERAŁY (najpierw!)
+      if (input.includes("POT")) return "K_MINERAL";
+      if (input.includes("WAP") || input === "CA") return "CA";
+      if (input.includes("MAG") || input === "MG") return "MG";
+      if (input.includes("SOD") || input === "NA") return "NA";
+      if (input.includes("FOS") || input === "P") return "P";
+      if (input.includes("SIAR") || input === "S") return "S";
+
+      // WITAMINY (dokładne dopasowanie!)
+      if (input === "A") return "A";
+      if (input === "C") return "C";
+      if (input === "D") return "D";
+
+      if (/^B(\d{1,2})?$/.test(input)) return 'B';
+
+      return null;
+    }
     function loadQuestion() {
       const select = document.getElementById("questionSelect").value;
 
@@ -589,47 +648,53 @@
       });
     }
     function showInformationAboutVitamin() {
-  const rawInput = document.getElementById('vitaminInput').value;
+      const rawInput = document.getElementById('vitaminInput').value;
 
-  if (!rawInput) {
-    document.querySelector('.vitamin-section').style.display = 'none';
-    return;
-  }
+      if (!rawInput) {
+        document.querySelector('.vitamin-section').style.display = 'none';
+        return;
+      }
 
-  const normalized = normalizeInput(rawInput);
-  const vitaminKey = detectVitamin(normalized);
+      const normalized = normalizeInput(rawInput);
+      const key = detectNutrient(normalized);
 
-  if (!vitaminKey || !vitamins[vitaminKey]) {
-    alert("Brak danych dla tej witaminy");
-    return;
-  }
+      let data = null;
 
-  const vitamin = vitamins[vitaminKey];
+      if (vitamins[key]) {
+        data = vitamins[key];
+      } else if (minerals[key]) {
+        data = minerals[key];
+      }
 
-  document.querySelector('.vitamin-section').style.display = 'block';
+      if (!data) {
+        alert("Brak danych");
+        return;
+      }
 
-  document.getElementById('vitaminTitle').textContent = vitamin.title;
+      document.querySelector('.vitamin-section').style.display = 'block';
 
-  const description = document.getElementById('vitaminDescription');
-  description.textContent = vitamin.description || '';
-  description.style.display = vitamin.description ? 'block' : 'none';
+      document.getElementById('vitaminTitle').textContent = data.title;
 
-  renderList('functions', vitamin.functions);
-  renderList('deficiency', vitamin.deficiency);
-  renderList('sources', vitamin.sources);
-}
-function renderList(elementId, items) {
-  const container = document.getElementById(elementId);
+      const description = document.getElementById('vitaminDescription');
+      description.textContent = data.description || '';
+      description.style.display = data.description ? 'block' : 'none';
 
-  if (!items || items.length === 0) {
-    container.textContent = "";
-    return;
-  }
+      renderList('functions', data.functions);
+      renderList('deficiency', data.deficiency);
+      renderList('sources', data.sources);
+    }
+    function renderList(elementId, items) {
+      const container = document.getElementById(elementId);
 
-  container.innerHTML = items
-    .map(item => `<p>${item}</p>`)
-    .join("");
-}
+      if (!items || items.length === 0) {
+        container.textContent = "";
+        return;
+      }
+
+      container.innerHTML = items
+        .map(item => `<p>${item}</p>`)
+        .join("");
+    }
     loadQuestionsToSelect();
   </script>
 </body>
