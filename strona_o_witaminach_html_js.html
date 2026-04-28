@@ -196,6 +196,16 @@
     .text-animate {
       transform: scale(1.4);
     }
+
+    ul {
+      list-style-type: circle;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 
@@ -518,6 +528,47 @@
         functions: ["składnik białek i enzymów"],
         deficiency: ["pogorszenie stanu włosów, skóry i paznokci,", "osłabienie organizmu (rzadko spotykany niedobór)"],
         sources: ["mięso, ryby,", "jaja,", "czosnek, cebula,", "rośliny strączkowe"]
+      },
+      FE: {
+        title: "Żelazo (Fe)",
+        functions: ["transport tlenu (hemoglobina)"],
+        deficiency: ["anemia (niedokrwistość)", "bladość skóry", "osłabienie, senność"],
+        sources: ["czerwone mięso (dobrze przyswajalne)", "wątróbka", "rośliny strączkowe", "szpinak", "produkty pełnoziarniste"]
+      },
+
+      ZN: {
+        title: "Cynk (Zn)",
+        functions: ["odporność, gojenie ran"],
+        deficiency: ["spadek odporności", "wolniejsze gojenie ran", "problemy ze skórą"],
+        sources: ["mięso i podroby", "pestki dyni", "orzechy", "produkty zbożowe pełnoziarniste"]
+      },
+
+      I: {
+        title: "Jod (I)",
+        functions: ["prawidłowa praca tarczycy"],
+        deficiency: ["powiększenie tarczycy (wole)", "zaburzenia hormonalne", "u dzieci: opóźnienie rozwoju"],
+        sources: ["ryby morskie", "owoce morza", "sól jodowana", "nabiał"]
+      },
+
+      SE: {
+        title: "Selen (Se)",
+        functions: ["działanie antyoksydacyjne"],
+        deficiency: ["osłabienie odporności", "problemy z tarczycą", "większa podatność na stres oksydacyjny"],
+        sources: ["orzechy brazylijskie (bardzo bogate źródło)", "ryby", "mięso", "jaja"]
+      },
+
+      CU: {
+        title: "Miedź (Cu)",
+        functions: ["tworzenie krwi i enzymów"],
+        deficiency: ["anemia", "osłabienie organizmu", "zaburzenia układu nerwowego"],
+        sources: ["wątróbka", "orzechy i nasiona", "kakao", "produkty pełnoziarniste"]
+      },
+
+      F: {
+        title: "Fluor (F)",
+        functions: ["zdrowie zębów"],
+        deficiency: ["większa podatność na próchnicę", "osłabienie szkliwa"],
+        sources: ["woda pitna", "herbata", "ryby"]
       }
     };
     function normalizeInput(input) {
@@ -555,6 +606,15 @@
       if (input.includes("SOD") || input === "NA") return "NA";
       if (input.includes("FOS") || input === "P") return "P";
       if (input.includes("SIAR") || input === "S") return "S";
+
+
+      // NOWE MIKROELEMENTY
+      if (input.includes("ZELAZ") || input === "FE") return "FE";
+      if (input.includes("CYNK") || input === "ZN") return "ZN";
+      if (input.includes("JOD") || input === "I") return "I";
+      if (input.includes("SELEN") || input === "SE") return "SE";
+      if (input.includes("MIEDZ") || input === "CU") return "CU";
+      if (input.includes("FLUOR") || input === "F") return "F";
 
       // WITAMINY (dokładne dopasowanie!)
       if (input === "A") return "A";
@@ -687,13 +747,20 @@
       const container = document.getElementById(elementId);
 
       if (!items || items.length === 0) {
-        container.textContent = "";
+        container.innerHTML = "";
         return;
       }
 
-      container.innerHTML = items
-        .map(item => `<p>${item}</p>`)
-        .join("");
+      const list = document.createElement("ul");
+
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+
+      container.innerHTML = "";
+      container.appendChild(list);
     }
     loadQuestionsToSelect();
   </script>
