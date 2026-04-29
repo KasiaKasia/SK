@@ -224,7 +224,7 @@
     <main>
 
       <section class="search">
-        <label for="vitaminInput">Wpisz nazwę witaminy:</label>
+        <label for="vitaminInput">Wpisz nazwę witaminy, składniki mineralne (makroelementy i mikroelementy):</label>
         <input type="text" id="vitaminInput" placeholder="np. Witamina C"
           onkeydown="if(event.key==='Enter') showInformationAboutVitamin()">
         <button onclick="showInformationAboutVitamin()">Sprawdź</button>
@@ -572,59 +572,60 @@
       }
     };
     function normalizeInput(input) {
+      const map = {
+        Ą: 'A', Ć: 'C', Ę: 'E', Ł: 'L',
+        Ń: 'N', Ó: 'O', Ś: 'S', Ż: 'Z', Ź: 'Z'
+      };
+
       return input
         .toUpperCase()
-        .replace(/Ą/g, 'A')
-        .replace(/Ć/g, 'C')
-        .replace(/Ę/g, 'E')
-        .replace(/Ł/g, 'L')
-        .replace(/Ń/g, 'N')
-        .replace(/Ó/g, 'O')
-        .replace(/Ś/g, 'S')
-        .replace(/Ż/g, 'Z')
-        .replace(/Ź/g, 'Z')
+        .split('')
+        .map(c => map[c] || c)
+        .join('')
         .replace(/\s+/g, '')
         .replace('WITAMINA', '')
         .replace(/[()]/g, '')
-        .replace(/₁/g, '1')
-        .replace(/₂/g, '2')
-        .replace(/₃/g, '3');
+        .replace(/₁|1/g, '1')
+        .replace(/₂|2/g, '2')
+        .replace(/₃|3/g, '3')
+        .replace(/₅|5/g, '3')
+        .replace(/₆|6/g, '3')
+        .replace(/₇|7/g, '3')
+        .replace(/₉|9/g, '3')
+        .replace(/₁₂|12/g, '3');
     }
+    const nutrientMap = [
+      { match: ["POT"], key: "K_MINERAL" },
+      { match: ["WAP", "CA"], key: "CA" },
+      { match: ["MAG", "MG"], key: "MG" },
+      { match: ["SOD", "NA"], key: "NA" },
+      { match: ["FOS", "P"], key: "P" },
+      { match: ["SIAR", "S"], key: "S" },
+      { match: ["ZELAZ", "FE"], key: "FE" },
+      { match: ["CYNK", "ZN"], key: "ZN" },
+      { match: ["JOD", "I"], key: "I" },
+      { match: ["SELEN", "SE"], key: "SE" },
+      { match: ["MIEDZ", "CU"], key: "CU" },
+      { match: ["FLUOR", "F"], key: "F" }
+    ];
     function detectNutrient(input) {
+      if (input === "K") return "K";
+      if (input.startsWith("D")) return "D";
+      const validB = ["B1", "B2", "B3", "B5", "B6", "B7", "B9", "B12"];
 
-      input = input.trim();
+      if (validB.includes(input)) return "B";
 
-      // WITAMINA K (dokładnie K/k)
-      if (input === "k" || input === "K") return "K";
+      for (const item of nutrientMap) {
+        if (item.match.some(m => input.includes(m))) {
+          return item.key;
+        }
+      }
 
-      input = input.toUpperCase();
-
-      // MINERAŁY (najpierw!)
-      if (input.includes("POT")) return "K_MINERAL";
-      if (input.includes("WAP") || input === "CA") return "CA";
-      if (input.includes("MAG") || input === "MG") return "MG";
-      if (input.includes("SOD") || input === "NA") return "NA";
-      if (input.includes("FOS") || input === "P") return "P";
-      if (input.includes("SIAR") || input === "S") return "S";
-
-
-      // NOWE MIKROELEMENTY
-      if (input.includes("ZELAZ") || input === "FE") return "FE";
-      if (input.includes("CYNK") || input === "ZN") return "ZN";
-      if (input.includes("JOD") || input === "I") return "I";
-      if (input.includes("SELEN") || input === "SE") return "SE";
-      if (input.includes("MIEDZ") || input === "CU") return "CU";
-      if (input.includes("FLUOR") || input === "F") return "F";
-
-      // WITAMINY (dokładne dopasowanie!)
-      if (input === "A") return "A";
-      if (input === "C") return "C";
-      if (input === "D") return "D";
-
-      if (/^B(\d{1,2})?$/.test(input)) return 'B';
+      if (["A", "C", "D"].includes(input)) return input;
 
       return null;
     }
+
     function loadQuestion() {
       const select = document.getElementById("questionSelect").value;
 
@@ -685,16 +686,13 @@
       }, 300);
     }
 
-
-
-
     function checkAnswer(clickedElement, selected, correct) {
       const allAnswers = document.querySelectorAll(".answer-box");
       allAnswers.forEach(el => el.style.pointerEvents = "none");
-      allAnswers.forEach((el, index) => el.style.pointerEvents = "none");
       (selected === correct) ? clickedElement.classList.add("correct") : clickedElement.classList.add("wrong");
 
     }
+
     function loadQuestionsToSelect() {
       const select = document.getElementById("questionSelect");
 
@@ -707,6 +705,7 @@
         select.appendChild(option);
       });
     }
+
     function showInformationAboutVitamin() {
       const rawInput = document.getElementById('vitaminInput').value;
 
@@ -743,6 +742,7 @@
       renderList('deficiency', data.deficiency);
       renderList('sources', data.sources);
     }
+    
     function renderList(elementId, items) {
       const container = document.getElementById(elementId);
 
